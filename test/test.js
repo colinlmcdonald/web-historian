@@ -78,11 +78,11 @@ describe("archive helpers", function(){
       fs.writeFileSync(archive.paths.list, urlArray.join("\n"));
      // console.log(urlArray.join("\n"));
 
-      setTimeout(function() {archive.readListOfUrls(function(urls)
+      archive.readListOfUrls(function(urls)
         {
         expect(urls).to.deep.equal(urlArray);
         done();
-      })}, 25);
+      })
     });
   });
 
@@ -106,7 +106,7 @@ describe("archive helpers", function(){
     });
   });
 
-  xdescribe("#addUrlToList", function () {
+  describe("#addUrlToList", function () {
     it("should add a url to the list", function (done) {
       var urlArray = ["example1.com", "example2.com\n"];
       fs.writeFileSync(archive.paths.list, urlArray.join("\n"));
@@ -120,7 +120,7 @@ describe("archive helpers", function(){
     });
   });
 
-  xdescribe("#isUrlArchived", function () {
+  describe("#isUrlArchived", function () {
     it("should check if a url is archived", function (done) {
       fs.writeFileSync(archive.paths.archivedSites + "/www.example.com", "blah blah");
 
@@ -139,7 +139,7 @@ describe("archive helpers", function(){
     });
   });
 
-  xdescribe("#downloadUrls", function () {
+  describe("#downloadUrls", function () {
     it("should download all pending urls in the list", function (done) {
       var urlArray = ["www.example.com", "www.google.com"];
       archive.downloadUrls(urlArray);

@@ -2,6 +2,7 @@ var path = require('path');
 var archive = require('../helpers/archive-helpers');
 var http = require('../helpers/http-helpers');
 var fs = require('fs');
+var fetcher = require('../workers/htmlfetcher');
 
 // require more modules/folders here!
 
@@ -9,14 +10,13 @@ exports.handleRequest = function (req, res) {
   console.log('Request method: ' + req.method + ' URL ' + req.url);
 
   var content = '';
-
   if (req.method === 'GET') {
     if (req.url === '/') {
-      fs.readFile(archive.paths.siteAssets + '/index.html', function(err, data) {
-        if (err) {
-          console.log(err);
-        }
-        res.end(data);
+        fs.readFile(archive.paths.siteAssets + '/index.html', function(err, data) {
+          if (err) {
+            console.log(err);
+          }
+          res.end(data);
       });
     }
     else if (req.url === '/www.google.com') {
@@ -34,20 +34,27 @@ exports.handleRequest = function (req, res) {
     }
   }
 
+
   if (req.method === 'POST') {
     var completeData = '';
     req.on('data', function(chunk) {
       completeData += chunk;
     });
     req.on('end', function() {
-      var parsedData = JSON.parse(completeData);
-      fs.writeFile(archive.paths.list, parsedData.url + '\n', 'utf8', function(err, data) {
+      var slicedData = completeData.slice(4);
+      var stringedData = JSON.stringify(slicedData);
+      fs.writeFile(archive.paths.list, stringedData, 'utf8', function(err, data) {
         if (err) {
           console.log(err);
           res.end()
         }
         res.writeHead(302, http.headers);
-        res.end();
+        fs.readFile(archive.paths.siteAssets + "/loading.html", function(err, data) {
+          if (err) {
+            console.log(err);
+          }
+          res.end(data);
+        })
       })
     })
   }

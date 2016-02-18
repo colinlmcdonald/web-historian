@@ -33,31 +33,47 @@ exports.readListOfUrls = function(cb){
     }
     urlArray = data.split("\n");
     cb(urlArray);
+   // return cb(urlArray);
   })
 };
 
 exports.isUrlInList = function(target, cb){
   var urlArray = [];
+  var outLoop = '';
   fs.readFile(this.paths.list, 'utf8', function(err, data) {
     if (err) {
       console.log(err);
     }
     urlArray = data.split("\n");
-    console.log(urlArray);
     for (var i = 0; i < urlArray.length; i++) {
       if (urlArray[i] === target) {
-        cb(urlArray[i]);
-        cb(urlArray[i]);
+        outLoop = urlArray[i];
       }
     }
+    cb(outLoop);
   })
 };
 
-exports.addUrlToList = function(){
+exports.addUrlToList = function(url, cb){
+  fs.writeFile(this.paths.list, url, 'utf8', function(err, data) {
+    if (err) {
+      console.log(err);
+    }
+    cb(data);
+  })
+
 };
 
-exports.isUrlArchived = function(){
+exports.isUrlArchived = function(url, cb){
+  if (this.paths.archivedSites + url) {
+    cb();
+  }
 };
 
-exports.downloadUrls = function(){
+exports.downloadUrls = function(urls){
+  // for (var i = 0; i < urls.length; i++) {
+    if (urls[i] === 'www.google.com') {
+      fs.mkdir(this.paths.archivedSites + "/" + urls[i]);
+    }
+  // }
 };
