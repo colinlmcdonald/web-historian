@@ -2,11 +2,17 @@
 // that are waiting.
 var archive = require('../helpers/archive-helpers');
 
-exports.htmlFetcher = function(url) {
-  http.get(url, function(res) {
-    console.log("Got response: " + res.statusCode);
-  }).on('error', function(e) {
-    console.log("Got error: " + e.message);
-  }); 
-}
+exports.htmlFetcher = function(url, dest, cb) {
+  var file = fs.createWriteStream(dest);
+  var request = http.get(url, function(response) {
+    response.pipe(file);
+    file.on('finish', function() {
+      file.close(cb);  // close() is async, call cb after close completes.
+    });
+  }).on('error', function(err) { // Handle errors
+    fs.unlink(dest); // Delete the file async. (But we don't check the result)
+    if (cb) cb(err.message);
+  });
+};
+
 
