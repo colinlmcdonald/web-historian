@@ -2,7 +2,9 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
 var fetcher = require('../workers/htmlfetcher');
-
+var $ = require('jquery');
+var request = require('request');
+var fileExists = require('file-exists')
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
  * Consider using the `paths` object below to store frequently used file paths. This way,
@@ -40,43 +42,51 @@ exports.readListOfUrls = function(cb){
 
 exports.isUrlInList = function(target){
   var urlArray = [];
+  var flag;
   fs.readFile(this.paths.list, 'utf8', function(err, data) {
     if (err) {
       console.log(err);
     }
     urlArray = data.split("\n");
+    console.log('this is the url array', urlArray);
 
     for (var i = 0; i < urlArray.length; i++) {
       if (urlArray[i] === target) {
-        console.log('container array ', urlArray);
         //got into here
-        return true;
+        console.log('got into for loop', urlArray[i]);
+        flag = true;
       }
+      else {
+      flag = false;
     }
+  }
   })
+  return flag;
 };
 
-exports.addUrlToList = function(url, cb){
-  fs.writeFile(this.paths.list, url, 'utf8', function(err, data) {
+exports.addUrlToList = function(url){
+  var newUrl = (url + '\n');
+  fs.appendFile(this.paths.list, url, 'utf8', function(err, data) {
     if (err) {
       console.log(err);
     }
-    cb(data);
   })
 
 };
 
 exports.isUrlArchived = function(url, cb){
-  if (this.paths.archivedSites + "/" + url) {
-    return true;
-  }
+  var parsedUrl = JSON.parse(url);
+  var checkUrl = this.paths.archivedSites + "/" + parsedUrl + '.html';
+  return fileExists(checkUrl);
 };
 
 exports.downloadUrls = function(url){
   // for (var i = 0; i < urls.length; i++) {
-    if (url === 'www.google.com') {
-      var dir = fs.mkdir(this.paths.archivedSites + "/" + url);
-      fetcher.htmlFetcher(url, dir);
-    }
+    var newUrl = JSON.parse(url);
+    // if (newUrl === "www.google.com") {
+      var dir = path.join(__dirname, '../archives/sites', newUrl);
+      console.log('this is dir ', dir);
+      fetcher.htmlFetcher(newUrl, dir);
+    //}
   // }
 };

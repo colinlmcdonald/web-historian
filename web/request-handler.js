@@ -5,9 +5,6 @@ var fs = require('fs');
 var fetcher = require('../workers/htmlfetcher');
 
 // require more modules/folders here!
-var foundIt = function(target) {
-  if (target) return true;
-}
 
 exports.handleRequest = function (req, res) {
   console.log('Request method: ' + req.method + ' URL ' + req.url);
@@ -36,8 +33,6 @@ exports.handleRequest = function (req, res) {
       res.end();
     }
   }
-
-
   if (req.method === 'POST') {
     var completeData = '';
     req.on('data', function(chunk) {
@@ -46,34 +41,34 @@ exports.handleRequest = function (req, res) {
     req.on('end', function() {
       var slicedData = completeData.slice(4);
       var stringedData = JSON.stringify(slicedData);
-      fs.readFile(archive.paths.list, 'utf8', function(err, data) {
-        if (err) {
-          console.log(err);
-        }
-        console.log('data in request-handler ', data);
-      })
-      if (!archive.isUrlInList(stringedData)) {
-     // console.log(stringedData);
-        fs.writeFile(archive.paths.list, stringedData, 'utf8', function(err, data) {
-          if (err) {
-            console.log(err);
-            res.end()
-          }
-          res.writeHead(302, http.headers);
-          fs.readFile(archive.paths.siteAssets + "/loading.html", function(err, data) {
-            if (err) {
-              console.log(err);
-            }
-            res.end(data);
-          })
-        })    
-      }
-      else {
-        archive.addUrlToList(stringedData);
-        if (!archive.isUrlArchived(stringedData)) {
-          archive.downloadUrls(stringedData);
-        }
-      }
+      var itWorks = archive.isUrlInList(stringedData);
+      console.log('this is the data passed into urlinlist', stringedData);
+      console.log('true if found, false if not', itWorks);
+     //  if (!itWorks) {
+     // // console.log(stringedData);
+     //    fs.writeFile(archive.paths.list, stringedData, 'utf8', function(err, data) {
+     //      if (err) {
+     //        console.log(err);
+     //        res.end()
+     //      }
+     //      res.writeHead(302, http.headers);
+     //      fs.readFile(archive.paths.siteAssets + "/loading.html", function(err, data) {
+     //        if (err) {
+     //          console.log(err);
+     //        }
+     //        res.end(data);
+     //      })
+     //    })    
+     //  }
+        //console.log('made it to addUrlToList');
+       // ************************
+        //this all works down here
+        // archive.addUrlToList(stringedData);
+        // if (!archive.isUrlArchived(stringedData)) {
+        //   console.log('confirmed URL is not archived');
+
+        // }
+      res.end();
     })
   }
 };
