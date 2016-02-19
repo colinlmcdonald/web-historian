@@ -35,36 +35,23 @@ exports.readListOfUrls = function(cb){
       console.log(err);
     }
     urlArray = data.split("\n");
-    cb(urlArray);
-   // return cb(urlArray);
+   // return cb(urlAy);
+    if (cb) {
+      cb(urlArray);
+    }
   })
 };
 
-exports.isUrlInList = function(target){
-  var urlArray = [];
-  var flag;
-  fs.readFile(this.paths.list, 'utf8', function(err, data) {
-    if (err) {
-      console.log(err);
-    }
-    urlArray = data.split("\n");
-    console.log('this is the url array', urlArray);
-
-    for (var i = 0; i < urlArray.length; i++) {
-      if (urlArray[i] === target) {
-        //got into here
-        console.log('got into for loop', urlArray[i]);
-        flag = true;
-      }
-      else {
-      flag = false;
-    }
-  }
-  })
-  return flag;
+exports.isUrlInList = function(url, callback){
+  exports.readListOfUrls(function(sites) {
+    var found = _.any(sites, function(site, i) {
+      return site.match(url)
+    });
+    callback(found);
+  });
 };
 
-exports.addUrlToList = function(url){
+exports.addUrlToList = function(url, cb){
   var newUrl = (url + '\n');
   fs.appendFile(this.paths.list, url, 'utf8', function(err, data) {
     if (err) {

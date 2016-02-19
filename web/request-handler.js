@@ -41,9 +41,27 @@ exports.handleRequest = function (req, res) {
     req.on('end', function() {
       var slicedData = completeData.slice(4);
       var stringedData = JSON.stringify(slicedData);
-      var itWorks = archive.isUrlInList(stringedData);
-      console.log('this is the data passed into urlinlist', stringedData);
-      console.log('true if found, false if not', itWorks);
+      archive.isUrlInList(stringedData, function(found) {
+        if (found) {
+          if (!archive.isUrlArchived(stringedData)) {
+            archive.downloadUrls(stringedData);
+            res.end();
+          } else {
+            fs.readFile(archive.paths.archivedSites + "/" + slicedData + '.html', function(err, data) {
+              if (err) {
+                console.log(err);
+                res.end(err);
+              }
+              res.end(data);
+            })
+          }
+        } else {
+          archive.addUrlToList(stringedData);
+          res.end();
+        }
+      })
+    })
+  }
      //  if (!itWorks) {
      // // console.log(stringedData);
      //    fs.writeFile(archive.paths.list, stringedData, 'utf8', function(err, data) {
@@ -68,7 +86,7 @@ exports.handleRequest = function (req, res) {
         //   console.log('confirmed URL is not archived');
 
         // }
-      res.end();
-    })
-  }
+      //res.end();
+
+
 };
